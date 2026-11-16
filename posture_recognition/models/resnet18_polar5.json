@@ -1,0 +1,22 @@
+{
+  "file": "resnet18_polar5.pth",
+  "sha256": "3ef34071e0991e9c5f8a02bb7a6765ce028c49a8a6e6bf634f3b20056207b46f",
+  "source": "POLAR/runs/resnet18_polar5_20261108_01/best_model.pth",
+  "architecture": "ResNet18",
+  "initialization": "ImageNet pretrained; POLAR five-class fine-tuning",
+  "selected_epoch": 25,
+  "selection": "validation macro F1; ties use validation loss",
+  "classes": ["standing", "sitting", "squatting", "lying", "bending"],
+  "input_size": 224,
+  "color_order": "RGB",
+  "crop_margin_each_side": 0.05,
+  "resize": "PIL LANCZOS, aspect preserving, centered padding; no center crop",
+  "padding_rgb": [124, 116, 104],
+  "mean": [0.485, 0.456, 0.406],
+  "std": [0.229, 0.224, 0.225],
+  "test_samples": 466,
+  "test_accuracy": 0.9656652360515021,
+  "test_macro_f1": 0.9640725407960584,
+  "metric_scope": "Conservatively cleaned POLAR holdout person crops; not D455 field or full-pipeline accuracy",
+  "dataset_manifest_sha256": "1d11feaf0bb0310d8ed6cc299e3c5a8e65b4e279576deaa032b6eeb4731add24"
+}

@@ -1,0 +1,9 @@
+# ROS 2 Humble cv_bridge is built against NumPy 1.x.
+numpy>=1.24,<2
+Pillow
+PyYAML
+torch>=2.1
+torchvision>=0.16
+opencv-python>=4.8,<4.12
+ultralytics==8.3.253
+lap>=0.5.12

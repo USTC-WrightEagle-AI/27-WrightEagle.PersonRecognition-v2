@@ -1,0 +1,79 @@
+# Head D455 + tracked 3D skeleton + POLAR ResNet18 RGB posture classification.
+
+camera:
+  # Factory intrinsics exported for the current 1280x720@30 head profile.
+  serial_no: "260722304986"
+  namespace: "head/camera"
+  width: 1280
+  height: 720
+  fps: 30
+  calibration_dir: "../../calibration/head_d455_hd"
+  rgb_topic: "/head/camera/color/image_raw"
+  # This must remain aligned to the color image.
+  depth_topic: "/head/camera/aligned_depth_to_color/image_raw"
+  camera_info_topic: "/head/camera/color/camera_info"
+  camera_info_timeout: 15.0
+  parameter_service: "/head/camera/get_parameters"
+  frame_id: "head_camera_color_optical_frame"
+
+  # RealSense optical coordinates: +X right, +Y image-down, +Z forward.
+  # Measured from 5 s of stationary D455 IMU data on 2026-10-16, transformed
+  # into the color optical frame with the device's internal IMU extrinsics.
+  # This does not depend on the unaccepted arm hand-eye rotation candidate.
+  down_axis: [-0.004230, 0.997762, 0.066737]
+
+  # 深度图参数
+  depth:
+    min_valid: 0.3        # 最小有效深度（米），小于此值视为无效
+    max_valid: 10.0       # 最大有效深度（米），大于此值视为无效
+    hole_search_radius: 5 # 深度空洞邻域搜索半径（像素）
+
+model:
+  # Portable PyTorch model; the upstream Jetson TensorRT engine is incompatible.
+  weights_path: "../models/yolov8n-pose.pt"
+  input_size: 640
+  conf_threshold: 0.35
+  device: 0
+
+person_selection:
+  # Keep every ByteTrack person so each ID can receive a name and position.
+  nearest_only: false
+
+tracking:
+  algorithm: "bytetrack"
+  config: "bytetrack.yaml"
+
+face_recognition:
+  enabled: true
+  python: "/home/rpp/miniconda3/envs/robot-face/bin/python"
+  worker: "../src/face_identity_worker.py"
+  database: "../../data/faces.npz"
+  provider: "auto"
+  threshold: 0.45
+  det_size: 1280
+  keypoint_confidence: 0.35
+  min_assignment_iou: 0.08
+  min_assignment_score: 0.25
+  every_n_frames: 5
+  confirmations: 2
+  history_size: 5
+  max_track_age: 45
+
+localization:
+  # Camera optical XYZ is the authoritative position output.
+  candidate_base_transform: "../../calibration/head_d455/handeye_candidate_v3.json"
+  publish_candidate_left_base: true
+
+classifier:
+  # POLAR 人体裁图五分类；骨架继续用于人脸关联和三维定位。
+  weights_path: "../models/resnet18_polar5.pth"
+  device: "cuda"
+  batch_size: 16
+  cpu_threads: 4
+  crop_margin: 0.05
+  # 0 关闭低分拒识；ResNet18 分数未校准，不能沿用 TCN 的 0.4。
+  confidence_threshold: 0.0
+  # 每个 ByteTrack ID 独立平滑；1.0 为完全使用当前帧。
+  smoothing_alpha: 0.6
+  min_history: 1
+  max_track_age: 15
