@@ -58,7 +58,7 @@ Humble 的 `cv_bridge`。启动脚本会检查 TorchVision；无需重新训练�
 先启动机器人 bringup，确认头部 RGB 和对齐深度话题存在，然后运行：
 
 ```bash
-cd /home/rpp/Robocup/pzy-cs
+cd /home/rpp/Robocup/PersonRecognition-v2
 ./posture_recognition/scripts/start_3d.sh
 ```
 
@@ -130,7 +130,7 @@ ros2 topic echo /person_identity_locations
 才会把姓名绑定到 ByteTrack ID；否则输出 `Unknown`。录入或更新人员仍使用：
 
 ```bash
-cd /home/rpp/Robocup/pzy-cs
+cd /home/rpp/Robocup/PersonRecognition-v2
 /home/rpp/miniconda3/envs/robot-face/bin/python remember_person.py 张三 --replace
 ```
 
@@ -172,7 +172,7 @@ source /opt/ros/humble/setup.bash
 校验模型：
 
 ```bash
-cd /home/rpp/Robocup/pzy-cs/posture_recognition/models
+cd /home/rpp/Robocup/PersonRecognition-v2/posture_recognition/models
 sha256sum -c SHA256SUMS
 ```
 
@@ -183,9 +183,9 @@ POLAR 留出集（466 张人体裁图）准确率 96.57%、宏平均 F1 96.41%�
 ## 测试
 
 ```bash
-cd /home/rpp/Robocup/pzy-cs
+cd /home/rpp/Robocup/PersonRecognition-v2
 source /opt/ros/humble/setup.bash
-export PYTHONPATH=/home/rpp/Robocup/pzy-cs/posture_recognition/src:$PYTHONPATH
+export PYTHONPATH=/home/rpp/Robocup/PersonRecognition-v2/posture_recognition/src:$PYTHONPATH
 /home/rpp/miniconda3/envs/foundationpose/bin/python \
   -m unittest discover -s posture_recognition/tests -v
 ```
