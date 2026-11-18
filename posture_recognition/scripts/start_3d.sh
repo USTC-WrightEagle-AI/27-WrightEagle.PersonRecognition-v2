@@ -19,6 +19,7 @@ if [[ ! -f "${CONFIG_PATH}" ]]; then
     echo "[ERROR] 配置文件不存在: ${CONFIG_PATH}" >&2
     exit 1
 fi
+CONFIG_PATH="$(realpath "${CONFIG_PATH}")"
 
 # ROS 2 packages come from Humble; CUDA packages come from foundationpose.
 # shellcheck disable=SC1090
@@ -35,7 +36,10 @@ for topic in \
     /head/camera/color/image_raw \
     /head/camera/aligned_depth_to_color/image_raw \
     /head/camera/color/camera_info; do
-    if ! ros2 topic info "${topic}" 2>/dev/null | \
+    # After the camera restarts, the CLI daemon can still report the old
+    # publisher graph. Discover this node directly instead of using its cache.
+    if ! /usr/bin/python3 /opt/ros/humble/bin/ros2 topic info \
+            --no-daemon --spin-time 5 "${topic}" 2>/dev/null | \
             grep 'Publisher count: [1-9]' >/dev/null; then
         echo "[ERROR] 头部相机话题没有发布者: ${topic}" >&2
         echo "        请先启动机器人 camera bringup。" >&2
