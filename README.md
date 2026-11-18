@@ -1,6 +1,39 @@
 # 27-WrightEagle.PersonRecognition-v2
 将姿势识别改为resnet18后的版本
 
+## 一键脚本
+
+机器人上仓库路径为 `/home/rpp/Robocup/PersonRecognition-v2`。两个脚本都要求
+头部 D455 已按 `1280,720,30` 启动 RGB 和对齐深度（相机要求见下文），
+脚本会在启动前检查话题，不满足时给出明确错误。
+
+一键人脸录入：运行后按提示输入被录入人的姓名（同名数据自动覆盖），
+自动检查 ROS 与 `robot-face` 环境后调用 `remember_person.py`：
+
+```bash
+./scripts/enroll_face.sh
+```
+
+额外参数原样传给 `remember_person.py`，例如：
+
+```bash
+./scripts/enroll_face.sh --no-depth-filter
+./scripts/enroll_face.sh --head-backend sdk   # 需先停止占用头部 D455 的 ROS 相机
+```
+
+一键综合检测（人脸身份 + 姿态分类 + 三维位置）：转交
+`posture_recognition/scripts/start_3d.sh`，环境、依赖与相机检查沿用其原有逻辑：
+
+```bash
+./scripts/start_detection.sh
+./scripts/start_detection.sh --no-image       # 不输出可视化图像
+./scripts/start_detection.sh --frame-skip 1   # 每两帧处理一帧，降低 GPU 占用
+```
+
+结果话题为 `/pose_classifier_3d/results` 和 `/person_identity_locations`，
+字段说明见 `posture_recognition/README.md`。人脸库 `data/faces.npz` 不存在时
+检测仍可运行，但所有姓名输出 `Unknown`，请先用录入脚本录入人脸。
+
 ## 人脸录入
 
 在仓库根目录运行，先启动头部 D455 的 ROS 相机：
